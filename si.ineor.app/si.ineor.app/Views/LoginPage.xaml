@@ -2,13 +2,33 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:vm="clr-namespace:si.ineor.app.ViewModels"
+             mc:Ignorable="d" xmlns:localization="clr-namespace:si.ineor.app.Localization"
              x:Class="si.ineor.app.Views.LoginPage"
              Shell.NavBarIsVisible="False">
+    <ContentPage.BindingContext>
+        <vm:LoginViewModel/>
+    </ContentPage.BindingContext>
     <ContentPage.Content>
-        <StackLayout Padding="10,0,10,0" VerticalOptions="Center">
-            <Button VerticalOptions="Center" Text="Login" Command="{Binding LoginCommand}"/>
+        <StackLayout Padding="10,0,10,0">
+            <StackLayout Padding="10,5,10,0" Orientation="Horizontal">
+                <Button VerticalOptions="Center" Text="SLO" Clicked="Slo_Clicked"/>
+                <Button VerticalOptions="Center" Text="EN" Clicked="En_Clicked"/>
+
+            </StackLayout>
+            <StackLayout Padding="10,50,10,0">
+                <Label  Text="{x:Static localization:Resource.Username}"></Label>
+                <Entry Text="{Binding authenticateRequest.Username,Mode=TwoWay}" ></Entry>
+                <Label Text="{x:Static localization:Resource.Password}"></Label>
+                <Entry Text="{Binding authenticateRequest.Password,Mode=TwoWay}"></Entry>
+                <Button VerticalOptions="Center" Text="{x:Static localization:Resource.LoginasAdmin}" Clicked="Admin_Clicked"/>
+                <Button VerticalOptions="Center" Text="{x:Static localization:Resource.LoginasUser}" Clicked="User_Clicked"/>
+
+            </StackLayout>
+            <Button Margin="50" VerticalOptions="EndAndExpand" Text="{x:Static localization:Resource.Login}" Command="{Binding LoginCommand}"/>
+
         </StackLayout>
+      
+
     </ContentPage.Content>
 </ContentPage>

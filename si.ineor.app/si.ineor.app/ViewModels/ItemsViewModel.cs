@@ -1,4 +1,5 @@
-﻿using si.ineor.app.Models;
+﻿using si.ineor.app.Entities;
+using si.ineor.app.Models;
 using si.ineor.app.Views;
 using System;
 using System.Collections.ObjectModel;
@@ -10,32 +11,75 @@ namespace si.ineor.app.ViewModels
 {
     public class ItemsViewModel : BaseViewModel
     {
-        private Item _selectedItem;
+        private Movie _selectedItem;
 
-        public ObservableCollection<Item> Items { get; }
+        public string searchText { get; set; }
+        public bool IsAdmin { get 
+            { 
+                return (Application.Current as App).restService.loggedUser.Role == Role.Admin; } }
+
+        public ObservableCollection<Movie> Items { get; }
         public Command LoadItemsCommand { get; }
         public Command AddItemCommand { get; }
-        public Command<Item> ItemTapped { get; }
+        public Command<Movie> ItemTapped { get; }
+        public Command<Movie> ItemDelete { get; }
 
         public ItemsViewModel()
         {
-            Title = "Browse";
-            Items = new ObservableCollection<Item>();
+            Title = "Browse Movies";
+            Items = new ObservableCollection<Movie>();
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
 
-            ItemTapped = new Command<Item>(OnItemSelected);
+            ItemTapped = new Command<Movie>(OnItemSelected);
+            ItemDelete = new Command<Movie>(OnItemDelete);
+
 
             AddItemCommand = new Command(OnAddItem);
+        }
+
+        private async void OnItemDelete(Movie obj)
+        {
+            try
+            {
+                if ((Application.Current as App).restService.loggedUser.Role == Role.Admin)
+                {
+
+                    var result = await (Application.Current as App).restService.DeleteMovie(obj.Id);
+                    if (result)
+                    {
+                        await (Application.Current as App).MainPage.DisplayAlert("Movie deleted", "New movie has been deleted", "Ok").ContinueWith(async x =>
+                        {
+                            await ExecuteLoadItemsCommand();
+                        });
+
+
+                    }
+                    else
+                    {
+                        await (Application.Current as App).MainPage.DisplayAlert("Movie deleted ERROR", "Movie has NOT been deleted", "Ok").ContinueWith(async x => {
+                            await ExecuteLoadItemsCommand();
+                        });
+                    }
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }    
+
+
         }
 
         async Task ExecuteLoadItemsCommand()
         {
             IsBusy = true;
-
+            Items.Clear();
             try
             {
-                Items.Clear();
-                var items = await DataStore.GetItemsAsync(true);
+                
+                var items = await (Application.Current as App).restService.GetMovies(searchText);
                 foreach (var item in items)
                 {
                     Items.Add(item);
@@ -53,11 +97,12 @@ namespace si.ineor.app.ViewModels
 
         public void OnAppearing()
         {
-            IsBusy = true;
+            
             SelectedItem = null;
+
         }
 
-        public Item SelectedItem
+        public Movie SelectedItem
         {
             get => _selectedItem;
             set
@@ -72,10 +117,11 @@ namespace si.ineor.app.ViewModels
             await Shell.Current.GoToAsync(nameof(NewItemPage));
         }
 
-        async void OnItemSelected(Item item)
+        async void OnItemSelected(Movie item)
         {
             if (item == null)
                 return;
+
 
             // This will push the ItemDetailPage onto the navigation stack
             await Shell.Current.GoToAsync($"{nameof(ItemDetailPage)}?{nameof(ItemDetailViewModel.ItemId)}={item.Id}");

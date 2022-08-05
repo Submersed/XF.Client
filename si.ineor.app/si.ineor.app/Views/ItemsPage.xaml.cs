@@ -1,4 +1,5 @@
-﻿using si.ineor.app.Models;
+﻿using si.ineor.app.Entities;
+using si.ineor.app.Models;
 using si.ineor.app.ViewModels;
 using si.ineor.app.Views;
 using System;
@@ -19,14 +20,15 @@ namespace si.ineor.app.Views
         public ItemsPage()
         {
             InitializeComponent();
-
             BindingContext = _viewModel = new ItemsViewModel();
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
             _viewModel.OnAppearing();
+            AddButton.IsEnabled = (Application.Current as App).restService.loggedUser.Role == Role.Admin;
+
         }
     }
 }

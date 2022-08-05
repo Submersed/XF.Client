@@ -1,4 +1,4 @@
-﻿using si.ineor.app.Models;
+﻿using si.ineor.app.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,8 +9,9 @@ namespace si.ineor.app.ViewModels
 {
     public class NewItemViewModel : BaseViewModel
     {
-        private string text;
+        private string title;
         private string description;
+        private DateTime releaseDate;
 
         public NewItemViewModel()
         {
@@ -22,14 +23,14 @@ namespace si.ineor.app.ViewModels
 
         private bool ValidateSave()
         {
-            return !String.IsNullOrWhiteSpace(text)
+            return !String.IsNullOrWhiteSpace(title)
                 && !String.IsNullOrWhiteSpace(description);
         }
 
-        public string Text
+        public string Title
         {
-            get => text;
-            set => SetProperty(ref text, value);
+            get => title;
+            set => SetProperty(ref title, value);
         }
 
         public string Description
@@ -49,17 +50,31 @@ namespace si.ineor.app.ViewModels
 
         private async void OnSave()
         {
-            Item newItem = new Item()
+            Movie newItem = new Movie()
             {
-                Id = Guid.NewGuid().ToString(),
-                Text = Text,
-                Description = Description
+                Title = title,
+                Description = description,
+                ReleaseDate = releaseDate
             };
 
-            await DataStore.AddItemAsync(newItem);
+            var added = await (Application.Current as App).restService.AddMovie(newItem);
 
+            if (added != null)
+            {
+                await (Application.Current as App).MainPage.DisplayAlert("New movie", "New movie has been added", "Ok").ContinueWith(async x =>
+                {
+                    await Shell.Current.GoToAsync("..");
+                });
+
+
+            }
+            else
+            {
+                await (Application.Current as App).MainPage.DisplayAlert("New movie ERROR", "New movie has NOT been added", "Ok").ContinueWith(async x => {
+                    await Shell.Current.GoToAsync("..");
+                });
+            }
             // This will pop the current page off the navigation stack
-            await Shell.Current.GoToAsync("..");
         }
     }
 }

@@ -10,7 +10,7 @@ namespace si.ineor.app.ViewModels
         public AboutViewModel()
         {
             Title = "About";
-            OpenWebCommand = new Command(async () => await Browser.OpenAsync("https://aka.ms/xamarin-quickstart"));
+            OpenWebCommand = new Command(async () => await Browser.OpenAsync($"{(Application.Current as App).restService.GetUri()}/swagger/index.html"));
         }
 
         public ICommand OpenWebCommand { get; }
