@@ -20,7 +20,7 @@ namespace si.ineor.app.Views
         public ItemsPage()
         {
             InitializeComponent();
-            BindingContext = _viewModel = new ItemsViewModel();
+            _viewModel = this.BindingContext as ItemsViewModel;
         }
 
         protected override async void OnAppearing()

@@ -74,25 +74,29 @@ namespace si.ineor.app.ViewModels
 
         async Task ExecuteLoadItemsCommand()
         {
-            IsBusy = true;
-            Items.Clear();
-            try
+            if (!IsBusy)
             {
-                
-                var items = await (Application.Current as App).restService.GetMovies(searchText);
-                foreach (var item in items)
+                IsBusy = true;
+                Items.Clear();
+                try
                 {
-                    Items.Add(item);
+
+                    var items = await (Application.Current as App).restService.GetMovies(searchText);
+                    foreach (var item in items)
+                    {
+                        Items.Add(item);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+                finally
+                {
+                    IsBusy = false;
                 }
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+           
         }
 
         public void OnAppearing()

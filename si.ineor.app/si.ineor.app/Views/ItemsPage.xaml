@@ -7,12 +7,15 @@
              xmlns:model="clr-namespace:si.ineor.app.Models" xmlns:model1="clr-namespace:si.ineor.app.Entities"
              x:Name="BrowseItemsPage">
     <ContentPage.ToolbarItems>
-        <ToolbarItem x:Name="AddButton" IsEnabled="True" Text="Add" Command="{Binding AddItemCommand}" />
+        <ToolbarItem x:Name="AddButton" Text="Add" Command="{Binding AddItemCommand}" />
     </ContentPage.ToolbarItems>
     <!--
       x:DataType enables compiled bindings for better performance and compile time validation of binding expressions.
       https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/data-binding/compiled-bindings
     -->
+    <ContentPage.BindingContext>
+        <local:ItemsViewModel/>
+    </ContentPage.BindingContext>
     <ContentPage.Content>
         <StackLayout>
             <StackLayout Orientation="Horizontal">
